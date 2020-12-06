@@ -1,6 +1,3 @@
-// const API_URL = process.env.SWAPI_API;
-// const axios = require('axios');
-
 const homeController = {
     homeApi: (req, res) => {
         try {
