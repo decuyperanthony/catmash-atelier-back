@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const PORT = process.env.PORT || 3000;
 
 const homeRouter = require("./app/router/homeRouter");
-// const router = require("./app/router/router");
+const catRouter = require("./app/router/catRouter");
 
 const app = express();
 
@@ -30,7 +30,7 @@ app.use((req, res, next) => {
 });
 
 // === on require le home router en dernier
-// app.use(router);
+app.use(catRouter);
 app.use(homeRouter);
 
 app.listen(PORT, () => {
