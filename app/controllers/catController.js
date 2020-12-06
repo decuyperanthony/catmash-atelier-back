@@ -1,10 +1,10 @@
 const API_URL = process.env.CAT_API;
 const axios = require('axios');
-const dataMapper = require('../dataMapper');
+const { Cat, Vote } = require('../models');
+const { Sequelize } = require('sequelize');
+const math = require('../utils/math');
 
-
-const homeController = {
-
+const catController = {
     getAllCatsFromAPI: async (req, res) => {
         try {
             let cats;
@@ -13,64 +13,94 @@ const homeController = {
                         cats = res.data;
                     })
                     .catch(err => console.trace(err));
-                console.log('cats.length', cats.images.length);
-                console.log('cats.images[2]', cats.images[2]);
-                res.send(cats);
+            res.send(cats);
         } catch (error) {
             console.trace(error);
             res.status(500).send(error);
         }
     },
 
-    addCat: async (req, res) => {
-        // ici je vais recevoir le cat_name dans le body
-        const { name, image_path } = req.body;
-        // je check dans la table cat si le chat existe
-        await dataMapper.getCatByName(name, (error, data) => {
-            if (error) {
-                console.trace(error);
-                return res.send(error);
-            }
-            console.log('bonjour');
-            if (data.rowCount === 1) {
-                // le chat existe déjà en bdd
-                // alors on insère pas le chat
-                console.log('data', data);
-                res.send('le chat est présent en bdd');
+    getOneRandomMatch: async (req, res) => {
+        try {
+            let cats;
+            let match = [];
+            await axios.get(`${API_URL}`)
+                    .then((res) => {
+                        cats = res.data;
+                    })
+                    .catch(err => console.trace(err));
+                const catsLength = cats.images.length -1;
+                const a = math.getRandomInt(0, catsLength);
+                let b = math.getRandomInt(0, catsLength);
+                while (a === b) {
+                    b = getRandomInt(0, cats.images.length - 1);
+                }
+                match.push(cats.images[a]);
+                match.push(cats.images[b]);
+            res.send(match);
+        } catch (error) {
+            console.trace(error);
+            res.status(500).send(error);
+        }
+    },
+
+    addVoteAndCatIfNotExists: async (req, res) => {
+        const { name } = req.body;
+        try {
+            let catId;
+            let message;
+            const cat = await Cat.findOne({
+              where: {
+                  name
+              }
+            });
+            if (!cat) {
+                const newCat = new Cat(req.body);
+                const savedCat = await newCat.save();
+                catId = savedCat.dataValues.id;
+                message = 'new cat in table cat';
             } else {
-                // on insert le chat
-                dataMapper.addCat(req.body, (error, data) => {
-                    if (error) {
-                        console.trace(error);
-                        res.send(error);
-                    }
-                    console.log('data à la créa du chat', data)
-                    if (data.rowCount === 1) {
-                        res.send('chat enregistré avec succes')
-                        // lancement mail
-                        // console.log(newUser);
-                        // mail.mailer(newUser.email);
-                    }
-                });
+                message = 'cat was already saved in database';
+                catId = cat.dataValues.id;
             }
-        });
-        // si il existe next
+            const newVote = new Vote({
+                cat_id: catId
+            });
+            const savedVote = await newVote.save();
+            res.send({
+                catId,
+                message,
+                vote: savedVote.dataValues
+            });
 
-        // sinon je l'insert dans ma table cats
+        } catch (error) {
+            console.trace(error);
+            res.status(500).send(error);
+        }
+    },
 
-        // enfin je recup l'id pg du chat et je l'insert dans la table vote
-
-
-       try {
-
-       } catch (error) {
-        console.trace(error);
-        res.status(500).send(error);
-       }
-    }
+    getCatRanking: async (req, res) => {
+        try {
+            const catRanking = await Vote.findAll({
+                group: ['cat_id', 'cat.id'],
+                attributes: [
+                    'cat_id',
+                    [Sequelize.fn('COUNT', 'cat_id'), 'votecount'],
+                ],
+                include: [{
+                    model: Cat, as: "cat",
+                }],
+                order: [[Sequelize.literal('votecount'), 'DESC']]
+            });
+            res.send(catRanking);
+        } catch (error) {
+            console.trace(error);
+            res.status(500).send(error);
+        }
+    },
 
 
 };
 
-module.exports = homeController;
+module.exports = catController;
 
