@@ -99,7 +99,6 @@ const catController = {
         }
     },
 
-
 };
 
 module.exports = catController;

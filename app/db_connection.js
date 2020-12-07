@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
 
-const dbConnection = new Sequelize(process.env.PG_URL_DEV, {
+const dbConnection = new Sequelize(process.env.PG_URL, {
     logging: false
 });
 
