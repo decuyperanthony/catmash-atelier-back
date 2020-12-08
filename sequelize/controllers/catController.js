@@ -1,8 +1,8 @@
 const API_URL = process.env.CAT_API;
 const axios = require('axios');
-const dataMapper = require('../dataMapper');
+const { Cat, Vote } = require('../models');
+const { Sequelize } = require('sequelize');
 const math = require('../utils/math');
-
 
 const catController = {
     getAllCatsFromAPI: async (req, res) => {
@@ -45,26 +45,34 @@ const catController = {
     },
 
     addVoteAndCatIfNotExists: async (req, res) => {
+        const { name } = req.body;
         try {
-            const { name } = req.body;
             let catId;
             let message;
-            const cat = await dataMapper.getCatByName(name);
-            if (cat.rowCount === 0) {
-                await dataMapper.addCat(req.body);
-                const newCat = await dataMapper.getCatByName(name);
-                catId = newCat.rows[0].id;
+            const cat = await Cat.findOne({
+              where: {
+                  name
+              }
+            });
+            if (!cat) {
+                const newCat = new Cat(req.body);
+                const savedCat = await newCat.save();
+                catId = savedCat.dataValues.id;
                 message = 'new cat in table cat';
             } else {
                 message = 'cat was already saved in database';
-                catId = cat.rows[0].id;
+                catId = cat.dataValues.id;
             }
-            await dataMapper.addVote(catId);
+            const newVote = new Vote({
+                cat_id: catId
+            });
+            const savedVote = await newVote.save();
             res.send({
                 catId,
                 message,
-                success: true
+                vote: savedVote.dataValues
             });
+
         } catch (error) {
             console.trace(error);
             res.status(500).send(error);
@@ -73,25 +81,24 @@ const catController = {
 
     getCatRanking: async (req, res) => {
         try {
-            const catRanking = await dataMapper.getRank();
-            res.send(catRanking.rows);
+            const catRanking = await Vote.findAll({
+                group: ['cat_id', 'cat.id'],
+                attributes: [
+                    'cat_id',
+                    [Sequelize.fn('COUNT', 'cat_id'), 'votecount'],
+                ],
+                include: [{
+                    model: Cat, as: "cat",
+                }],
+                order: [[Sequelize.literal('votecount'), 'DESC']]
+            });
+            res.send(catRanking);
         } catch (error) {
             console.trace(error);
             res.status(500).send(error);
         }
     },
 
-    getTotalVotes: async (req, res) => {
-        try {
-            const totalVotes = await dataMapper.getTotalVotes();
-            res.send(totalVotes.rows);
-        } catch (error) {
-            console.trace(error);
-            res.status(500).send(error);
-        }
-    }
-
 };
 
 module.exports = catController;
-
