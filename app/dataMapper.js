@@ -9,16 +9,13 @@ const dataMapper = {
     },
 
     addCat: (newCat, callback) => {
-        console.log('heloooo')
         const { name, image_path } = newCat;
-        console.log('newCat in dm', newCat)
         const query = 'INSERT INTO "cat"("name","image_path") VALUES ($1,$2)';
         const values = [name, image_path];
         return db_connection.query(query, values, callback);
     },
 
     addVote: (catId, callback) => {
-        // const { name, image_path } = newCat;
         const query = 'INSERT INTO "vote"("cat_id") VALUES ($1)';
         const values = [catId];
         return db_connection.query(query, values, callback);
@@ -37,6 +34,11 @@ const dataMapper = {
                         ORDER BY countVote DESC
                         `;
         return db_connection.query(query, callback);
+    },
+
+    getTotalVotes: (cb) => {
+        const query = `SELECT COUNT(*) AS total_votes FROM vote`;
+        return db_connection.query(query, cb);
     }
 };
 

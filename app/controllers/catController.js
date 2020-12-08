@@ -1,8 +1,6 @@
 const API_URL = process.env.CAT_API;
 const axios = require('axios');
-const dataMapper = require('../dataMapper')
-// const { Cat, Vote } = require('../models');
-// const { Sequelize } = require('sequelize');
+const dataMapper = require('../dataMapper');
 const math = require('../utils/math');
 
 
@@ -82,6 +80,16 @@ const catController = {
             res.status(500).send(error);
         }
     },
+
+    getTotalVotes: async (req, res) => {
+        try {
+            const totalVotes = await dataMapper.getTotalVotes();
+            res.send(totalVotes.rows);
+        } catch (error) {
+            console.trace(error);
+            res.status(500).send(error);
+        }
+    }
 
 };
 
