@@ -41,6 +41,11 @@ const dataMapper = {
     getTotalVotes: (cb) => {
         const query = `SELECT COUNT(*) AS total_votes FROM vote`;
         return db_connection.query(query, cb);
+    },
+
+    getTotalCats: (cb) => {
+        const query = `SELECT COUNT(*) AS total_cats FROM cat`;
+        return db_connection.query(query, cb);
     }
 };
 

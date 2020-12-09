@@ -81,10 +81,20 @@ const catController = {
         }
     },
 
-    getTotalVotes: async (req, res) => {
+    getTotalCountVotes: async (req, res) => {
         try {
             const totalVotes = await dataMapper.getTotalVotes();
             res.send(totalVotes.rows);
+        } catch (error) {
+            console.trace(error);
+            res.status(500).send(error);
+        }
+    },
+
+    getTotalCountCats: async (req, res) => {
+        try {
+            const totalCats = await dataMapper.getTotalCats();
+            res.send(totalCats.rows);
         } catch (error) {
             console.trace(error);
             res.status(500).send(error);

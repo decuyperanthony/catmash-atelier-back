@@ -7,7 +7,8 @@ const catController = require('../controllers/catController');
 router.get('/cats', catController.getAllCatsFromAPI);
 router.get('/match', catController.getOneRandomMatch);
 router.get('/rank', catController.getCatRanking);
-router.get('/totalvotes', catController.getTotalVotes);
+router.get('/totalvotes', catController.getTotalCountVotes);
+router.get('/totalcats', catController.getTotalCountCats);
 
 //* POST => ADD VOTE AND CAT (IF CAT NOT EXISTS)
 router.post('/vote', catController.addVoteAndCatIfNotExists);
