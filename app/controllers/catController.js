@@ -73,7 +73,7 @@ const catController = {
 
     getCatRanking: async (req, res) => {
         try {
-            const catRanking = await dataMapper.getRank();
+            const catRanking = await dataMapper.getRank(req.query);
             res.send(catRanking.rows);
         } catch (error) {
             console.trace(error);

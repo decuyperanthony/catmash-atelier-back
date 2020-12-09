@@ -21,7 +21,8 @@ const dataMapper = {
         return db_connection.query(query, values, callback);
     },
 
-    getRank: (callback) => {
+    getRank: (payload, callback) => {
+        const { limit, offset } = payload;
         // const query = `SELECT cat.id, cat.name, count(*) as countVote, cat.image_path FROM cat JOIN vote ON cat.id = vote.cat_id GROUP BY cat.id ORDER BY countVote`;
         const query = `SELECT
                         cat.id,
@@ -32,8 +33,10 @@ const dataMapper = {
                         JOIN vote ON cat.id = vote.cat_id
                         GROUP BY cat.id
                         ORDER BY countVote DESC
+                        LIMIT $1 OFFSET $2
                         `;
-        return db_connection.query(query, callback);
+        const values = [limit, offset];
+        return db_connection.query(query, values, callback);
     },
 
     getTotalVotes: (cb) => {
