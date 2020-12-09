@@ -23,7 +23,6 @@ const dataMapper = {
 
     getRank: (payload, callback) => {
         const { limit, offset } = payload;
-        // const query = `SELECT cat.id, cat.name, count(*) as countVote, cat.image_path FROM cat JOIN vote ON cat.id = vote.cat_id GROUP BY cat.id ORDER BY countVote`;
         const query = `SELECT
                         cat.id,
                         cat.name,
@@ -32,7 +31,7 @@ const dataMapper = {
                         FROM cat
                         JOIN vote ON cat.id = vote.cat_id
                         GROUP BY cat.id
-                        ORDER BY countVote DESC
+                        ORDER BY countVote DESC, cat.id DESC
                         LIMIT $1 OFFSET $2
                         `;
         const values = [limit, offset];
