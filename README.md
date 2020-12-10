@@ -1,3 +1,13 @@
+<!-- PROJECT LOGO -->
+<br />
+<p align="center">
+  <a href="https://github.com/othneildrew/Best-README-Template">
+    <img src="./.github/img/logo-192.png" alt="Logo" width="auto" height="150">
+    <!-- <img src=".github/img/logo.png" alt="Logo" width="80" height="80"> -->
+  </a>
+
+  <h3 align="center">Cat Mash API</h3>
+
 ## Table of Contents
 
 * [About the Project](#about-the-project)
