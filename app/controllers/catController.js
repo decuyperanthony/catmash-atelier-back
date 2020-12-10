@@ -30,13 +30,13 @@ const catController = {
                     })
                     .catch(err => console.trace(err));
                 const catsLength = cats.images.length -1;
-                const a = math.getRandomInt(0, catsLength);
-                let b = math.getRandomInt(0, catsLength);
-                while (a === b) {
-                    b = getRandomInt(0, cats.images.length - 1);
+                const firstInt = math.getRandomInt(0, catsLength);
+                let secondInt = math.getRandomInt(0, catsLength);
+                while (firstInt === secondInt) {
+                    secondInt = getRandomInt(0, cats.images.length - 1);
                 }
-                match.push(cats.images[a]);
-                match.push(cats.images[b]);
+                match.push(cats.images[firstInt]);
+                match.push(cats.images[secondInt]);
             res.send(match);
         } catch (error) {
             console.trace(error);
